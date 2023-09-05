@@ -1,0 +1,67 @@
+<resources>
+    <string name="app_name">Open Timeline</string>
+
+    <!-- General -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="stop_showing">Don\'t show again</string>
+    <string name="alert">Alert</string>
+    <string name="yes">Yes</string>
+
+    <!-- Main action bar -->
+    <string name="view_timeline">View Timeline</string>
+    <string name="start_io_activity">Manage data</string>
+    <string name="settings">Settings</string>
+
+
+    <!-- Main Activity -->
+    <string name="permission_request">Permission request</string>
+    <string name="permission_dialog">"In order for the timeline recorder to work well, you should enable the precise location, \"Allow all the time\", and notification permissions. To function properly on start up, battery optimisation also needs to be disabled."</string>
+    <string name="timeline_wont_work">The timeline functionality may not work as intended</string>
+    <string name="always_allow_dialog">Please select \"Allow all the time\"</string>
+    <string name="records_not_found">No records found</string>
+    <string name="displaying_results">Displaying records</string>
+
+    <!-- Settings -->
+    <string name="tracking_enabled">Timeline recording has been enabled</string>
+    <string name="tracking_disabled">Timeline recording has been disabled</string>
+    <string name="interval_set_message">Location updates will now be retrieved every %1$d minutes</string>
+    <string name="number_too_high">%1$d is not a valid value, please enter 1440 or less</string>
+    <string name="number_too_low">%1$d is not a valid value, please enter 1 or more</string>
+    <string name="permission_request_activated">Permission request will now show</string>
+    <string name="privacy_policy_title">Privacy policy</string>
+    <string name="privacy_policy_text">While this app does collect sensitive location data, non of it is transmitted to the developers, keeping your data private. The maps though, are provided by Google who will collect details such as device identifiers, you can find their privacy policy here: https://policies.google.com/privacy</string>
+    <string name="button_recording_set">Stop recording timeline</string>
+    <string name="button_not_recording_set">Start recording timeline</string>
+    <string name="tracking_button_message">Press to turn location tracking on or off</string>
+    <string name="set_interval_button_message">Set how often you want the app to record your location in minutes</string>
+    <string name="privacy_policy_button_message">View the apps privacy policy</string>
+    <string name="get_permission_request_button_message">You previously disabled permission requests, press to reset</string>
+
+    <!-- Settings UI -->
+    <string name="location_on_off_message">Press to turn timeline recording on or off</string>
+    <string name="enter_interval_message">Enter how often you want to record your location in minutes (1–1440)</string>
+    <string name="set_interval">Set interval</string>
+    <string name="privacy_policy_button">App privacy policy</string>
+    <string name="get_permission_request">Get permission request again</string>
+
+    <!-- IOActivity -->
+    <string name="on_long_export_click_message">Export your location data to a GPX format file</string>
+    <string name="on_long_click_import_message">Import your location data from a GPX file</string>
+    <string name="on_long_click_clear_data_message">Clear all your location data from the app</string>
+    <string name="sure_want_delete_message">Are you sure you want to delete all your location records from the app</string>
+    <string name="data_cleared_message">Database records cleared</string>
+    <string name="data_not_cleared_message">Data has not been deleted</string>
+    <string name="test_records_inserted">Test records inserted</string>
+    <string name="data_imported_message">Data successfully imported</string>
+    <string name="data_exported_message">Data successfully exported</string>
+
+    <!-- IOActivity UI -->
+    <string name="export_to_gpx_button">Export location data to a GPX file</string>
+    <string name="import_from_gpx_button">import location data from a GPX file</string>
+    <string name="clear_database_button">Clear location data from app</string>
+    <string name="add_test_records">Add test records</string>
+
+    <!-- ForegroundLocationService -->
+    <string name="notification_title">Open Timeline running</string>
+</resources>

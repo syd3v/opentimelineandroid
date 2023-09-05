@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- The button which allows the user to select which day to display-->
+    <item
+        android:id="@+id/getCal"
+        android:title="@string/view_timeline"
+        android:icon="@drawable/calendar_month"
+        app:showAsAction="ifRoom" />
+
+    <!-- The button which allows the user to enter the activity to manage their data -->
+    <item
+        android:id="@+id/manage_data"
+        android:title="@string/start_io_activity"
+        android:icon="@drawable/database_icon"
+        app:showAsAction="ifRoom" />
+
+    <!-- Settings, should always be in the overflow -->
+    <item android:id="@+id/action_settings"
+        android:title="@string/settings"
+        app:showAsAction="never" />
+
+</menu>
