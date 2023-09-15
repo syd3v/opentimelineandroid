@@ -1,13 +1,3 @@
-/**
- * This class is a foreground service which retrieves the current user location and
- * sends it to the UI as a toast.
- * It is heavily based off a codelabs guide:
- * https://codelabs.developers.google.com/codelabs/while-in-use-location/
- *
- * The aim is to develop it further into a more mature and customised solution
- * This currently meets the first implementation target for this module
- */
-
 package org.otimeline.opentimeline.services
 
 import android.Manifest
