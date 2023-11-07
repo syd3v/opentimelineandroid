@@ -8,15 +8,12 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.room.Room
 import androidx.work.OneTimeWorkRequestBuilder
@@ -27,6 +24,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import org.otimeline.opentimeline.MainActivity
 import java.util.concurrent.TimeUnit
 import org.otimeline.opentimeline.R
@@ -101,25 +99,8 @@ class ForegroundLocationService : Service() {
         // Gets an instance of shared preferences
         val prefs = getSharedPreferences(SETTINGS, Context.MODE_PRIVATE)
 
-        // Build the location request for the fused provider
-        locationRequest = LocationRequest.create().apply {
-
-            // Retrieve the interval set by the user
-            val intervalPref = 2L
-
-            // Set the interval for location updates, may not be exact
-            interval = TimeUnit.MINUTES.toMillis(intervalPref)
-
-            // Set the the fastest interval possible
-            fastestInterval = TimeUnit.MINUTES.toMillis(intervalPref - 1)
-
-            // Set the max interval to wait between updates
-            maxWaitTime = TimeUnit.MINUTES.toMillis(intervalPref + 1)
-
-            // Set the request priority to PRIORITY_HIGH_ACCURACY, during testing the priority BALANCED
-            // was unreliable.
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        }
+        // Build the location request with high priority
+        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, TimeUnit.MINUTES.toMillis(1)).build()
 
         // Create an instance of locationCallback, which takes the received package of data and processes it
         // It will add the location to the database if it is different to the previous record
@@ -131,8 +112,8 @@ class ForegroundLocationService : Service() {
 
                 // Assign the class variables with the new location data
                 currentLocation = locationResult.lastLocation
-                latitude = locationResult.lastLocation.latitude
-                longitude = locationResult.lastLocation.longitude
+                latitude = locationResult.lastLocation!!.latitude
+                longitude = locationResult.lastLocation!!.longitude
 
                 // Only adds a record to the database if it is different to the previous record
                 // Currently will always return false as a new instance of the foreground service is run each time
@@ -194,8 +175,8 @@ class ForegroundLocationService : Service() {
         startService(Intent(applicationContext, ForegroundLocationService::class.java))
 
         /** Attempt to get the location
-         * @locationRequest is the call/object to ask for the current location
-         * @locationCallback is the locationCallback method which processes the data package
+         * locationRequest is the call/object to ask for the current location
+         * locationCallback is the locationCallback method which processes the data package
          * The looper creates a loop for the fusedlocation service to send the callback on
          */
         try {
