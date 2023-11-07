@@ -291,6 +291,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 )
             )
         }
+
+        // Displays the current days records on the map
+        date = LocalDate.now()
+        getDaysRecords()
     }
 
     // Takes a LatLng, adds a marker to the map, and then stores the generated object in the markers list
@@ -361,8 +365,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         Log.i(TAG, "getDaysRecords() called")
 
         // Takes the dateTime variable and changes it to the epoch time in milli at the start of said day
-        // Zone offset is set to BST time for now, a more advanced solution should be implemented in future
-        val dayStart = date.atStartOfDay().toEpochSecond(ZoneOffset.of("+01:00")) * 1000
+        // Zone offset is set to UTC time for now, a more advanced solution should be implemented in future
+        val dayStart = date.atStartOfDay().toEpochSecond(ZoneOffset.of("+00:00")) * 1000
 
         // Takes the dayStart variable and adds 86399999 milliseconds which takes it to the millisecond before next midnight
         val dayEnd = dayStart + 86399999

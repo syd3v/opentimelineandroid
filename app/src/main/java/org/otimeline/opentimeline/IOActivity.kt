@@ -13,6 +13,8 @@ import androidx.appcompat.app.ActionBar
 import androidx.room.Room
 import org.otimeline.opentimeline.database.*
 import org.otimeline.opentimeline.io.*
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 /**
  * The IOActivity allows the user to manage their data in the database
@@ -57,7 +59,10 @@ class IOActivity : AppCompatActivity() {
         // Initiate the export to GPX button
         exportGPX = findViewById(R.id.export_gpx)
         exportGPX.setOnClickListener {
-            toGPX("locations.gpx")
+            // Names file with current date
+            val dateFormat = DateTimeFormatter.ofPattern("ddMMyy")
+            val date = LocalDate.now().format(dateFormat).toString()
+            toGPX(date + "locations.gpx")
         }
         exportGPX.setOnLongClickListener {
             Toast.makeText(applicationContext, R.string.on_long_export_click_message, Toast.LENGTH_LONG).show()
