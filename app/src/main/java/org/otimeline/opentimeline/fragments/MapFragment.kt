@@ -13,6 +13,8 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 import org.otimeline.opentimeline.services.InterfaceUtils
 import org.otimeline.opentimeline.R
 
@@ -29,6 +31,7 @@ class MapFragment(private val onMapReadyInterface: InterfaceUtils) : Fragment(),
     private lateinit var mView: MapView
     private lateinit var mMap: GoogleMap
     private var markers: MutableList<Marker> = mutableListOf()
+    private var lines: MutableList<Polyline> = mutableListOf()
 
 
     // Point the fragment at the correct UI container
@@ -79,7 +82,6 @@ class MapFragment(private val onMapReadyInterface: InterfaceUtils) : Fragment(),
 
         val marker: Marker? = mMap.addMarker(MarkerOptions().position(centre).title(title))
         markers.add(marker!!)
-
     }
 
     // Removes all markers in the list on the map, and then clears the list
@@ -88,7 +90,22 @@ class MapFragment(private val onMapReadyInterface: InterfaceUtils) : Fragment(),
 
         markers.forEach { it.remove() }
         markers.clear()
+    }
 
+    // Draws a line between LatLng points
+    fun drawLine(pointA: LatLng, pointB: LatLng) {
+        Log.i(TAG, "drawLine function called")
+
+        val line: Polyline = mMap.addPolyline(PolylineOptions().add(pointA, pointB))
+        lines.add(line)
+    }
+
+    // Removes all lines previously drawn on the map
+    fun removeLines() {
+        Log.i(TAG, "removeLines function called")
+
+        lines.forEach { it.remove() }
+        lines.clear()
     }
 
     // Overriding the required methods for the map view to function
