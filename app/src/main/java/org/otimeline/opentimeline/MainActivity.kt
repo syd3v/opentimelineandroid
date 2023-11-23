@@ -4,47 +4,30 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.content.ComponentName
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
-import android.os.PersistableBundle
-import android.provider.Settings.SettingNotFoundException
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
 import android.widget.Toast
-import android.widget.Toolbar
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.room.Room
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.GoogleMapOptions
-import com.google.android.gms.maps.MapFragment
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 import java.time.LocalDate
 import java.util.Calendar
 import org.otimeline.opentimeline.database.*
 import org.otimeline.opentimeline.services.*
+import org.otimeline.opentimeline.fragments.*
 import java.sql.Date
 import java.sql.Time
 import java.time.ZoneOffset
@@ -62,26 +45,23 @@ import java.time.ZoneOffset
  * granted
  */
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+class MainActivity : AppCompatActivity(), InterfaceUtils {
 
     // Logging tag
     private val TAG = "MainActivity"
 
-    // Variables used to interact with the map ui and list of markers on screen
-    private lateinit var mView: MapView
-    private lateinit var mMap: GoogleMap
-    private var markers: MutableList<Marker> = mutableListOf()
+    // Initialising the variable to access the map fragment
+    private var mMap: MapFragment = MapFragment(this)
 
     // Variable to interact with toolbar and buttons
     private lateinit var actionBar: ActionBar
-
 
     // Create database and database DAO variables
     private lateinit var db: LocationsDB
     private lateinit var locationDao: LocationsDBDao
 
     // Button and object used to present the user with a calendar dialog
-    private lateinit var date: LocalDate
+    private var date: LocalDate = LocalDate.now()
     private var cal = Calendar.getInstance()
 
     // Variables for shared preferences
@@ -92,7 +72,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        Log.d(TAG, "onCreate called")
+        Log.i(TAG, "onCreate called")
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -134,10 +114,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 .show()
         }
 
-        // Set up the map
-        mView = findViewById(R.id.map_frame)
-        mView.onCreate(savedInstanceState)
-        mView.getMapAsync(this)
+        // Set up the map fragment
+        Log.i(TAG, "Initialising MapFragment")
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.map_fragment_container, mMap)
+            .commit()
 
         // Create the database (or just database reference) and database DAO
         // This builder also forces the use of main thread queries, which is not recommended
@@ -170,7 +151,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         } else {
             Log.i(TAG, "Tracking is false, not starting tracking")
         }
-
     }
 
     // requestPermissions is used to request all the permissions needed, because of the way Android handles this,
@@ -256,63 +236,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
-    // Overrides onMapReady so
-    override fun onMapReady(gMap: GoogleMap) {
-        Log.i(TAG, "onMapReady received")
-
-        // Initialising the local variable so the map object can be accessed by other methods
-        mMap = gMap
-
-        // Setting the map type and controls
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL)
-        mMap.uiSettings.isZoomControlsEnabled = true
-        mMap.uiSettings.isCompassEnabled = true
-        mMap.uiSettings.isMyLocationButtonEnabled = true
-
-        // The following retrieves the previous location and focuses the map on it
-        val lastLocation = locationDao.retrieveLatestLocation()
-        if (lastLocation != null) {
-            mMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(
-                        lastLocation.latitude!!,
-                        lastLocation.longitude!!
-                    ), 15F
-                )
-            )
-        } else {
-            // If no records are found the map is focused on London
-            val london = LatLng(51.5, -0.13)
-            mMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    london,
-                    15F
-                )
-            )
-        }
-
-        // Displays the current days records on the map
-        date = LocalDate.now()
-        getDaysRecords()
-    }
-
-    // Takes a LatLng, adds a marker to the map, and then stores the generated object in the markers list
-    private fun addMarker(centre: LatLng, title: String) {
-
-        val marker: Marker? = mMap.addMarker(MarkerOptions().position(centre).title(title))
-        markers.add(marker!!)
-
-    }
-
-    // Removes all markers in the list on the map, and then clears the list
-    private fun removeMarkers() {
-
-        markers.forEach { it.remove() }
-        markers.clear()
-
-    }
-
     // Added following this guide: https://developer.android.com/training/permissions/requesting#request-permission
     // This function is called by onCreate and asks for the location permissions if not already granted
     private val requestPermissionLauncher = registerForActivityResult(
@@ -346,6 +269,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    // When notified that the map is ready, this method displays the current days records
+    override fun onMapReady() {
+        Log.i(TAG, "onMapReady received")
+        getDaysRecords()
+    }
+
     // Object which contains the result of the calendar picker
     private val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
 
@@ -374,7 +303,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val locations: List<Location> = locationDao.retrieveForDate(dayStart, dayEnd)
 
         // Remove all markers already on the screen (if any)
-        removeMarkers()
+        mMap.removeMarkers()
 
         if (locations.isNotEmpty()) {
 
@@ -388,50 +317,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 val centre = LatLng(latitude!!, longitude!!)
 
-                addMarker(centre, time)
+                mMap.addMarker(centre, time)
             }
+
+            // Centre the map on the last/latest location of the day
+            mMap.centreMapAt(LatLng(locations.last().latitude!!, locations.last().longitude!!))
 
             Toast.makeText(applicationContext, R.string.displaying_results, Toast.LENGTH_SHORT).show()
 
         } else {
             Toast.makeText(applicationContext, R.string.records_not_found, Toast.LENGTH_SHORT).show()
         }
-    }
-
-    // As MapView is being used, all the following methods must be implemented/overridden, more details can be found at:
-    // https://developers.google.com/maps/documentation/android-sdk/reference/com/google/android/libraries/maps/MapView
-    override fun onStart() {
-        super.onStart()
-        mView.onStart()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        mView.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mView.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mView.onStop()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mView.onDestroy()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        super.onSaveInstanceState(outState, outPersistentState)
-        mView.onSaveInstanceState(outState)
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mView.onLowMemory()
     }
 }
